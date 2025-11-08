@@ -9,14 +9,71 @@ import TripPodCard from '@/components/TripPodCard';
 import RideRequestCard from '@/components/RideRequestCard';
 import NotificationCard from '@/components/NotificationCard';
 import UserProfileCard from '@/components/UserProfileCard';
+import type { User } from '@supabase/supabase-js';
+
+interface TripPod {
+  id: string;
+  created_by: string;
+  title: string;
+  description: string;
+  departure_location: string;
+  arrival_location: string;
+  departure_time: string;
+  available_seats: number;
+  total_seats: number;
+  price_per_seat: number;
+  status: string;
+  created_at: string;
+  driver_profiles: {
+    full_name: string;
+    phone: string;
+    rating: number;
+    profile_image: string;
+  };
+}
+
+interface RideRequest {
+  id: string;
+  trip_pod_id: string;
+  student_id: string;
+  pickup_location: string;
+  seats_requested: number;
+  total_amount: number;
+  status: string;
+  created_at: string;
+  users: {
+    full_name: string;
+    email: string;
+    phone: string;
+    profile_image: string;
+  };
+  trip_pods: {
+    from_location: string;
+    to_location: string;
+    departure_date: string;
+    departure_time: string;
+    price_per_seat: number;
+  };
+}
+
+interface Notification {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  message: string;
+  data: any;
+  read: boolean;
+  created_at: string;
+}
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [user, setUser] = useState(null);
-  const [tripPods, setTripPods] = useState([]);
-  const [myRequests, setMyRequests] = useState([]);
-  const [recentRides, setRecentRides] = useState([]);
-  const [notifications, setNotifications] = useState([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [tripPods, setTripPods] = useState<TripPod[]>([]);
+  const [myRequests, setMyRequests] = useState<RideRequest[]>([]);
+  const [recentRides, setRecentRides] = useState<RideRequest[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,8 +100,23 @@ export default function DashboardPage() {
       const [ridesResponse, podsResponse, notificationsResponse] = await Promise.all([
         supabase
           .from('ride_requests')
-          .select('*')
-          .eq('user_id', user.id)
+          .select(`
+            *,
+            users!inner(
+              full_name,
+              email,
+              phone,
+              profile_image
+            ),
+            trip_pods!inner(
+              from_location,
+              to_location,
+              departure_date,
+              departure_time,
+              price_per_seat
+            )
+          `)
+          .eq('student_id', user.id)
           .order('created_at', { ascending: false })
           .limit(5),
 

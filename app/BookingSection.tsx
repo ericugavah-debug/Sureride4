@@ -3,13 +3,20 @@
 
 import { useState, useRef } from 'react'
 
+interface Suggestion {
+  id: number;
+  name: string;
+  address: string;
+  type: string;
+}
+
 export default function BookingSection() {
   const [tripType, setTripType] = useState('one-way');
   const [transportMode, setTransportMode] = useState('road');
   const [fromValue, setFromValue] = useState('');
   const [toValue, setToValue] = useState('');
-  const [fromSuggestions, setFromSuggestions] = useState([]);
-  const [toSuggestions, setToSuggestions] = useState([]);
+  const [fromSuggestions, setFromSuggestions] = useState<Suggestion[]>([]);
+  const [toSuggestions, setToSuggestions] = useState<Suggestion[]>([]);
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
@@ -29,7 +36,7 @@ export default function BookingSection() {
     { id: 7, name: 'Abuja Airport', address: 'Abuja, FCT, Nigeria', type: 'airport' }
   ];
 
-  const handleLocationSearch = (value, type) => {
+  const handleLocationSearch = (value: string, type: 'from' | 'to') => {
     if (value.length > 2) {
       const filtered = mockSuggestions.filter(suggestion => 
         suggestion.name.toLowerCase().includes(value.toLowerCase()) ||
@@ -51,7 +58,7 @@ export default function BookingSection() {
     }
   };
 
-  const selectLocation = (location, type) => {
+  const selectLocation = (location: { id: number; name: string; address: string; type: string }, type: 'from' | 'to') => {
     if (type === 'from') {
       setFromValue(location.name);
       setShowFromSuggestions(false);
@@ -61,7 +68,7 @@ export default function BookingSection() {
     }
   };
 
-  const getCurrentLocation = async (type) => {
+  const getCurrentLocation = async (type: 'from' | 'to') => {
     setIsLocating(true);
     setTimeout(() => {
       const currentLocation = 'University of Lagos, Lagos';
@@ -74,7 +81,7 @@ export default function BookingSection() {
     }, 1500);
   };
 
-  const getLocationIcon = (type) => {
+  const getLocationIcon = (type: string) => {
     switch (type) {
       case 'university': return 'ri-school-line text-blue-500';
       case 'airport': return 'ri-plane-line text-green-500';

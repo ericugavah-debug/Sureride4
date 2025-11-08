@@ -1,12 +1,6 @@
 
 'use client'
 
-import { useAuth } from '@/components/AuthProvider'
-import DriverDashboard from './DriverDashboard'
-
-// Existing code from the original file
-'use client';
-
 import { useState } from 'react';
 import DriverAuth from './DriverAuth';
 import DriverDashboard from './DriverDashboard';

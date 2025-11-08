@@ -4,10 +4,25 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
+interface SearchResult {
+  id: number;
+  operator: string;
+  departureTime: string;
+  arrivalTime: string;
+  duration: string;
+  price: number;
+  vehicle: string;
+  rating: number;
+  seatsLeft: number;
+  amenities: string[];
+  route: string;
+  image: string;
+}
+
 export default function BookPage() {
   const [tripType, setTripType] = useState('one-way');
   const [transportMode, setTransportMode] = useState('road');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [formData, setFormData] = useState({
