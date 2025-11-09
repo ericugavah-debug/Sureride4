@@ -352,7 +352,7 @@ export default function DashboardPage() {
               {tripPods.map((pod) => (
                 <TripPodCard
                   key={pod.id}
-                  tripPod={pod}
+                  tripPod={adaptTripPod(pod)}
                   onBookingSuccess={handleBookingSuccess}
                 />
               ))}
@@ -432,4 +432,34 @@ export default function DashboardPage() {
       </div>
     </div>
   );
+}
+
+// Adapter to match TripPodCard's expected shape
+function adaptTripPod(pod: TripPod) {
+  // Attempt to derive date and time if departure_time contains a datetime; otherwise provide fallbacks
+  let departureDate = '';
+  let departureTime = '';
+  try {
+    const dt = new Date(pod.departure_time);
+    if (!isNaN(dt.getTime())) {
+      departureDate = dt.toISOString().split('T')[0];
+      departureTime = dt.toTimeString().slice(0, 5);
+    }
+  } catch {}
+
+  return {
+    id: pod.id,
+    driver_id: pod.created_by,
+    from_location: pod.departure_location,
+    to_location: pod.arrival_location,
+    departure_date: departureDate || new Date().toISOString().split('T')[0],
+    departure_time: departureTime || '08:00',
+    price_per_seat: pod.price_per_seat,
+    total_seats: pod.total_seats,
+    available_seats: pod.available_seats,
+    vehicle_type: '',
+    vehicle_plate: '',
+    status: pod.status,
+    driver_profiles: pod.driver_profiles,
+  };
 }
